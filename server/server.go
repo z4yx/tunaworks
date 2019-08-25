@@ -76,7 +76,9 @@ func MakeServer(cfg *Config) *Server {
 	}
 	s.engine.Use(contextErrorLogger)
 
-	s.engine.GET("/latest", s.getLatestMonitorInfo)
+	s.engine.Static("/assets", "./assets")
+	s.engine.StaticFile("/", "./assets/html/index.html")
+	s.engine.GET("/monitor/latest", s.getLatestMonitorInfo)
 
 	return s
 }
