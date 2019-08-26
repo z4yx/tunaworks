@@ -9,20 +9,17 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <title>TUNA works!</title>
   <style>
-    .cell-site-state {
-      text-align: center;
-    }
   </style>
 </head>
 
 <body>
-  <div class="tunaworks" id="overall">
-    <top-nav-bar current="Overall"></top-nav-bar>
+  <div class="tunaworks" id="ssl">
+    <top-nav-bar current="SSL"></top-nav-bar>
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-10">
           <div class="pb-2 mt-4 mb-2">
-            <h3>Overall Status</h3>
+            <h3>SSL Certificate Status</h3>
           </div>
         </div>
       </div>
@@ -31,19 +28,18 @@
           <table class="table table-bordered table-sm table-hover">
             <thead>
               <tr>
-                <td class="text-center" scope="col">Sites \ Prober</td>
-                <th class="text-center" scope="col" v-for="name in latestInfo.NodeNames">{{name}}</th>
+                <th class="text-center" scope="col">Site</th>
+                <th class="text-center" scope="col">Expiry date</th>
+                <th class="text-center" scope="col">Prober</th>
+                <th class="text-center" scope="col">Updated</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in latestInfo.Websites">
-                <th class="align-middle table-light" scope="row">{{site.Url}}</th>
-                <td v-for="(name, node) in latestInfo.NodeNames" v-bind:class="site.Nodes[node].ClassObj">
-                  <i v-bind:class="site.Nodes[node].Icon"></i> <span
-                    class="site-state-line1">{{site.Nodes[node].Line1}}</span>
-                  <br>
-                  <small>{{site.Nodes[node].Line2}}</small>
-                </td>
+              <tr v-for="site in sslInfo" v-bind:class="site.ClassObj">
+                <td class="align-middle table-light" scope="row">{{site.Url}}</td>
+                <td class="align-middle table-light" scope="row"><i v-bind:class="site.Icon"></i> {{site.Expiry | ISO8601}}</td>
+                <td class="align-middle table-light" scope="row">{{site.Prober}}</td>
+                <td class="align-middle table-light" scope="row">{{site.Updated | ISO8601}}</td>
               </tr>
             </tbody>
           </table>

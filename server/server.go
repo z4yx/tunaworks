@@ -78,6 +78,7 @@ func MakeServer(cfg *Config) *Server {
 
 	s.engine.Static("/assets", "./assets")
 	s.engine.StaticFile("/", "./assets/html/index.html")
+	s.engine.StaticFile("/ssl", "./assets/html/ssl.html")
 	s.engine.GET("/monitor/latest", s.getLatestMonitorInfo)
 
 	return s
