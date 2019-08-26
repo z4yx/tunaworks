@@ -2,6 +2,7 @@ package prober
 
 import (
 	"crypto/tls"
+	"net"
 	"time"
 )
 
@@ -9,7 +10,12 @@ func ProbeSSLHost(network, hostWithPort string) (expiry time.Time, sslErr error)
 	conf := &tls.Config{
 		InsecureSkipVerify: false,
 	}
-	conn, sslErr := tls.Dial(network, hostWithPort, conf)
+	myDial := &net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 0,
+		DualStack: false,
+	}
+	conn, sslErr := tls.DialWithDialer(myDial, network, hostWithPort, conf)
 	if sslErr != nil {
 		return
 	}
