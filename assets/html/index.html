@@ -9,59 +9,45 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <title>TUNA works!</title>
   <style>
-    .cell-site-state{
+    .cell-site-state {
       text-align: center;
     }
   </style>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-    <a class="navbar-brand" href="#">TUNA.works</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="./">Overall <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="./ssl">SSL</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-  <div class="container" id="overall">
-    <div class="row justify-content-center">
-      <div class="col-10">
+  <div class="tunaworks" id="overall">
+    <top-nav-bar></top-nav-bar>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-10">
           <div class="pb-2 mt-4 mb-2">
             <h3>Overall Status</h3>
           </div>
+        </div>
       </div>
-    </div>
-    <div class="row justify-content-center">
-      <div class="col-10">
-        <table class="table table-bordered table-sm table-hover">
-          <thead>
-            <tr>
-              <td class="text-center" scope="col">Sites \ Prober</td>
-              <th class="text-center" scope="col" v-for="name in latestInfo.NodeNames">{{name}}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="site in latestInfo.Websites">
-              <th class="align-middle" scope="row">{{site.Url}}</th>
-              <td v-for="(name, node) in latestInfo.NodeNames" v-bind:class="site.Nodes[node].ClassObj">
-                <i v-bind:class="site.Nodes[node].Icon"></i> <span class="site-state-line1">{{site.Nodes[node].Line1}}</span>
-                <br>
-                <small>{{site.Nodes[node].Line2}}</small>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row justify-content-center">
+        <div class="col-10">
+          <table class="table table-bordered table-sm table-hover">
+            <thead>
+              <tr>
+                <td class="text-center" scope="col">Sites \ Prober</td>
+                <th class="text-center" scope="col" v-for="name in latestInfo.NodeNames">{{name}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="site in latestInfo.Websites">
+                <th class="align-middle table-light" scope="row">{{site.Url}}</th>
+                <td v-for="(name, node) in latestInfo.NodeNames" v-bind:class="site.Nodes[node].ClassObj">
+                  <i v-bind:class="site.Nodes[node].Icon"></i> <span
+                    class="site-state-line1">{{site.Nodes[node].Line1}}</span>
+                  <br>
+                  <small>{{site.Nodes[node].Line2}}</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

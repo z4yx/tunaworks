@@ -1,18 +1,28 @@
 function CertIsAboutToExpire(dateString) {
-    return (new Date(dateString)).getTime() - Date.now() < 7 * 86400;
+    return (new Date(dateString)).getTime() - Date.now() < 7 * 86400 * 1000;
 }
-Vue.component('site-state', {
-    props: ['state'],
+Vue.component('top-nav-bar', {
     data: function () {
-        let line1 = '';
-        let line2 = '';
-
         return {
-            line1: line1,
-            line2: line2,
         }
     },
-    template: '<div classs="alert-success">{{line1}}<br>{{line2}}</div>'
+    template: '<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">\
+      <a class="navbar-brand" href="#">TUNA.works</a>\
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"\
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">\
+        <span class="navbar-toggler-icon"></span>\
+      </button>\
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">\
+        <ul class="navbar-nav mr-auto">\
+          <li class="nav-item active">\
+            <a class="nav-link" href="./">Overall <span class="sr-only">(current)</span></a>\
+          </li>\
+          <li class="nav-item">\
+            <a class="nav-link" href="./ssl">SSL</a>\
+          </li>\
+        </ul>\
+      </div>\
+    </nav>'
 })
 var overall = new Vue({
     el: '#overall',
@@ -36,9 +46,10 @@ var overall = new Vue({
                     if (rec.SSLError !== null || rec.StatusCode >= 400) {
                         rec.ClassObj["alert-danger"] = true;
                         rec.Icon["fa-times"] = true;
-                        if (rec.SSLError !== null)
+                        if (rec.SSLError !== null) {
+                            rec.Line1 = "SSL";
                             rec.Line2 = rec.SSLError;
-                        else {
+                        } else {
                             rec.Line1 = rec.StatusCode;
                             rec.Line2 = rec.ResponseTime + " ms";
                         }
