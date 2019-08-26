@@ -6,8 +6,8 @@ func main() {
 	cfg := server.Config{
 		Debug: true,
 		Server: server.ServerConfig{
-			Addr:       "127.0.0.1",
-			Port:       8000,
+			Addr:       "0.0.0.0",
+			Port:       8001,
 			DBProvider: "sqlite3",
 			DBName:     "tunaworks.db",
 		},

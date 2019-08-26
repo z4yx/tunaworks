@@ -7,3 +7,4 @@ CREATE TABLE `nodes`(
     `active`    BOOLEAN NOT NULL
 );
 
+CREATE UNIQUE INDEX i_token ON nodes (`token`);

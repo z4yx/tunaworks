@@ -39,7 +39,15 @@ func (ctx *ProberCtx) reportResult(result *internal.ProbeResult) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(ctx.baseUrl+"/prober/result", "application/json", bytes.NewBuffer(jbytes))
+	logger.Debug("result: %s", string(jbytes))
+	client := &http.Client{Timeout: time.Second * 10}
+	request, err := http.NewRequest("POST", ctx.baseUrl+"/prober/result", bytes.NewBuffer(jbytes))
+	if err != nil {
+		return err
+	}
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("X-Token", ctx.cfg.Token)
+	resp, err := client.Do(request)
 	if err != nil {
 		return err
 	}

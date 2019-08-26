@@ -4,9 +4,10 @@ CREATE TABLE `records`(
     `response_time`  INT DEFAULT NULL,
     `site`           INT NOT NULL,
     `node`           INT NOT NULL,
-    `updated`        TIMESTAMP NOT NULL,
+    `protocol`       INT NOT NULL,
+    `updated`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `ssl_err`        VARCHAR DEFAULT NULL,
     `ssl_expire`     TIMESTAMP NOT NULL
 );
 
-CREATE INDEX i_site_node_updated ON records (`site`,`node`,`updated` DESC);
+CREATE INDEX i_s_n_p_u ON records (`site`,`node`,`protocol`,`updated` DESC);

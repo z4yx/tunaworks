@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
+	internal "github.com/z4yx/tunaworks/internal"
 )
 
 type Server struct {
@@ -39,6 +40,37 @@ func (s *Server) getLatestMonitorInfo(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, empty{})
 	} else {
 		c.JSON(http.StatusOK, inf)
+	}
+}
+
+func (s *Server) getAllWebsites(c *gin.Context) {
+	inf, err := s.QuerySites(true)
+	if err != nil {
+		logger.Errorf("getAllWebsites: %s", err.Error())
+		c.JSON(http.StatusInternalServerError, empty{})
+	} else {
+		c.JSON(http.StatusOK, inf)
+	}
+}
+
+func (s *Server) insertProberRecord(c *gin.Context) {
+	auth, node := s.AuthNode(c.GetHeader("X-Token"))
+	if !auth {
+		c.JSON(http.StatusForbidden, empty{})
+	} else {
+		var result internal.ProbeResult
+		// raw, _ := c.GetRawData()
+		// logger.Debug("%v", raw)
+		if err := c.ShouldBindJSON(&result); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		err := s.InsertRecord(node, &result)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, empty{})
+		} else {
+			c.JSON(http.StatusOK, empty{})
+		}
 	}
 }
 
@@ -80,6 +112,8 @@ func MakeServer(cfg *Config) *Server {
 	s.engine.StaticFile("/", "./assets/html/index.html")
 	s.engine.StaticFile("/ssl", "./assets/html/ssl.html")
 	s.engine.GET("/monitor/latest", s.getLatestMonitorInfo)
+	s.engine.GET("/prober/websites", s.getAllWebsites)
+	s.engine.POST("/prober/result", s.insertProberRecord)
 
 	return s
 }

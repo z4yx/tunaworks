@@ -26,7 +26,7 @@ func (s *Server) QueryNodes(active bool) (nodes map[int]string, err error) {
 	return
 }
 
-func (s *Server) QuerySites(active bool) (sites map[int]string, err error) {
+func (s *Server) QuerySites(active bool) (sites internal.AllWebsites, err error) {
 	where := ""
 	if active {
 		where = "WHERE active=1"
@@ -37,7 +37,8 @@ func (s *Server) QuerySites(active bool) (sites map[int]string, err error) {
 		return
 	}
 	defer rows.Close()
-	sites = make(map[int]string)
+
+	sites.Websites = make([]internal.Website, 0, 10)
 	for rows.Next() {
 		var url string
 		var id int
@@ -45,9 +46,40 @@ func (s *Server) QuerySites(active bool) (sites map[int]string, err error) {
 		if err != nil {
 			return
 		}
-		sites[id] = url
+		sites.Websites = append(sites.Websites, internal.Website{
+			Id:  id,
+			Url: url,
+		})
 	}
 	return
+}
+
+func (s *Server) AuthNode(token string) (succ bool, node int) {
+	succ = false
+	node = -1
+	rows, err := s.db.Query("SELECT node FROM nodes WHERE token=?", token)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+	defer rows.Close()
+	if rows.Next() {
+		err = rows.Scan(&node)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+		return true, node
+	}
+	return
+}
+
+func (s *Server) InsertRecord(node int, rec *internal.ProbeResult) error {
+	r, err := s.db.Exec(`INSERT INTO records(http_code, response_time, site, node, protocol, ssl_err, ssl_expire)
+VALUES (?, ?, ?, ?, ?, ?, ?)`, rec.StatusCode, rec.ResponseTime, rec.WebsiteId, node, rec.Protocol, rec.SSLError, rec.SSLExpire)
+	affected, _ := r.RowsAffected()
+	logger.Debug("RowsAffected %d", affected)
+	return err
 }
 
 func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err error) {
@@ -59,11 +91,11 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 	// for i, val := range node2name {
 	// 	nodes[i] = val
 	// }
-	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,http_code,response_time,ssl_err,ssl_expire
-	FROM (SELECT * FROM records ORDER BY site,node,updated DESC) tmp
+	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,protocol,http_code,response_time,ssl_err,ssl_expire
+	FROM (SELECT * FROM records ORDER BY site,node,protocol,updated DESC) tmp
 	INNER JOIN sites
 	ON tmp.site = sites.site AND sites.active = 1
-	GROUP BY tmp.site, tmp.node`)
+	GROUP BY tmp.site, tmp.node, tmp.protocol`)
 	if err != nil {
 		return
 	}
@@ -84,6 +116,7 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 			&site,
 			&url,
 			&node,
+			&record.Protocol,
 			&record.StatusCode,
 			&record.ResponseTime,
 			&record.SSLError,
@@ -100,13 +133,18 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 				ret.Websites = append(ret.Websites, *siteInfo)
 			}
 			siteInfo = &internal.WebsiteInfo{
-				Id:    site,
-				Url:   url,
-				Nodes: make(map[int]internal.MonitorRec),
+				Id:     site,
+				Url:    url,
+				Nodes4: make(map[int]internal.MonitorRec),
+				Nodes6: make(map[int]internal.MonitorRec),
 			}
 			lastSite = site
 		}
-		siteInfo.Nodes[node] = record
+		if record.Protocol == 4 {
+			siteInfo.Nodes4[node] = record
+		} else if record.Protocol == 6 {
+			siteInfo.Nodes6[node] = record
+		}
 	}
 	if siteInfo != nil {
 		ret.Websites = append(ret.Websites, *siteInfo)
