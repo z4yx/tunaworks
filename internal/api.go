@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"time"
@@ -21,11 +22,27 @@ func (ni NullInt64) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ni.Int64)
 }
 
+func (ni NullInt64) UnmarshalJSON(data []byte) error {
+	if bytes.Equal(data, []byte("null")) {
+		ni.Valid = true
+		return nil
+	}
+	return json.Unmarshal(data, &ni.Int64)
+}
+
 func (ni NullString) MarshalJSON() ([]byte, error) {
 	if !ni.Valid {
 		return []byte("null"), nil
 	}
 	return json.Marshal(ni.String)
+}
+
+func (ni NullString) UnmarshalJSON(data []byte) error {
+	if bytes.Equal(data, []byte("null")) {
+		ni.Valid = true
+		return nil
+	}
+	return json.Unmarshal(data, &ni.String)
 }
 
 type MonitorRec struct {

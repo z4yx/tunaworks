@@ -15,10 +15,11 @@ import (
 type ProberCtx struct {
 	allWebsites internal.AllWebsites
 	cfg         *ProberConfig
+	baseUrl     string
 }
 
 func (ctx *ProberCtx) getWebsites() error {
-	resp, err := http.Get("https://" + ctx.cfg.Server + "/prober/websites")
+	resp, err := http.Get(ctx.baseUrl + "/prober/websites")
 	if err != nil {
 		return err
 	}
@@ -28,7 +29,7 @@ func (ctx *ProberCtx) getWebsites() error {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(body), &ctx.allWebsites)
+	err = json.Unmarshal(body, &ctx.allWebsites)
 
 	return err
 }
@@ -38,7 +39,7 @@ func (ctx *ProberCtx) reportResult(result *internal.ProbeResult) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post("https://"+ctx.cfg.Server+"/prober/result", "application/json", bytes.NewBuffer(jbytes))
+	resp, err := http.Post(ctx.baseUrl+"/prober/result", "application/json", bytes.NewBuffer(jbytes))
 	if err != nil {
 		return err
 	}
@@ -55,24 +56,31 @@ func (ctx *ProberCtx) probeWebsites() {
 		networks = append(networks, "tcp6")
 	}
 	for _, site := range ctx.allWebsites.Websites {
-		logger.Debug("Probing %d %s", site.Id, site.Url)
 		u, err := url.Parse(site.Url)
 		if err != nil {
-			logger.Error("Invalid url %s", err.Error())
+			logger.Error("Invalid url %s: %s", site.Url, err.Error())
 			continue
 		}
 		result := internal.ProbeResult{
 			WebsiteId: site.Id,
 		}
 		for _, network := range networks {
-			logger.Debug(network)
+			logger.Debug("Probing %d %s with %s", site.Id, site.Url, network)
 			if network == "tcp4" {
 				result.Protocol = 4
 			} else if network == "tcp6" {
 				result.Protocol = 6
 			}
+			if u.Port() == "" {
+				if u.Scheme == "https" {
+					u.Host += ":443"
+				} else {
+					u.Host += ":80"
+				}
+			}
 			if u.Scheme == "https" {
 				expiry, sslErr := ProbeSSLHost(network, u.Host)
+				logger.Debug("ProbeSSLHost (%v) %v", expiry, sslErr)
 				if sslErr != nil {
 					result.SSLError = internal.NullString{
 						sql.NullString{
@@ -85,7 +93,9 @@ func (ctx *ProberCtx) probeWebsites() {
 				}
 				result.SSLExpire = expiry
 			}
-			statusCode, responseTime, httpErr := ProbeHttpHost(network, site.Url)
+			statusCode, responseTime, httpErr := ProbeHttpHost(network, u.String())
+			logger.Debug("ProbeHttpHost %v %v %v", statusCode, responseTime, httpErr)
+
 			if httpErr != nil {
 				result.SSLError = internal.NullString{
 					sql.NullString{
@@ -102,7 +112,7 @@ func (ctx *ProberCtx) probeWebsites() {
 				}
 				result.ResponseTime = internal.NullInt64{
 					sql.NullInt64{
-						Int64: int64(responseTime),
+						Int64: int64(responseTime / time.Millisecond),
 						Valid: true,
 					},
 				}
@@ -116,12 +126,21 @@ func (ctx *ProberCtx) Run() {
 	tickerProbe := time.NewTicker(time.Duration(ctx.cfg.Interval) * time.Second)
 	tickerUpdateList := time.NewTicker(10 * time.Minute)
 
-	ctx.getWebsites()
+	err := ctx.getWebsites()
+	if err == nil {
+		ctx.probeWebsites()
+	} else {
+		logger.Error("getWebsites %s", err.Error())
+	}
 
 	for {
 		select {
 		case <-tickerUpdateList.C:
-			ctx.getWebsites()
+			err = ctx.getWebsites()
+			if err != nil {
+				logger.Error("getWebsites %s", err.Error())
+			}
+
 		case <-tickerProbe.C:
 			ctx.probeWebsites()
 		}
@@ -129,8 +148,13 @@ func (ctx *ProberCtx) Run() {
 }
 
 func MakeProber(cfg *ProberConfig) *ProberCtx {
+	proto := "http://"
+	if cfg.Https {
+		proto = "https://"
+	}
 	ret := &ProberCtx{
-		cfg: cfg,
+		cfg:     cfg,
+		baseUrl: proto + cfg.Server,
 	}
 	return ret
 }
