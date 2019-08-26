@@ -1,4 +1,4 @@
-package server
+package internal
 
 import (
 	"database/sql"
@@ -46,4 +46,22 @@ type WebsiteInfo struct {
 type LatestMonitorInfo struct {
 	NodeNames map[int]string
 	Websites  []WebsiteInfo
+}
+
+type ProbeResult struct {
+	WebsiteId    int
+	Protocol     int
+	StatusCode   NullInt64
+	ResponseTime NullInt64
+	SSLError     NullString
+	SSLExpire    time.Time
+}
+
+type Website struct {
+	Id  int
+	Url string
+}
+
+type AllWebsites struct {
+	Websites []Website
 }

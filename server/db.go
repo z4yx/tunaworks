@@ -1,5 +1,7 @@
 package server
 
+import internal "github.com/z4yx/tunaworks/internal"
+
 func (s *Server) QueryNodes(active bool) (nodes map[int]string, err error) {
 	where := ""
 	if active {
@@ -48,7 +50,7 @@ func (s *Server) QuerySites(active bool) (sites map[int]string, err error) {
 	return
 }
 
-func (s *Server) QueryLatestMonitorInfo() (ret *LatestMonitorInfo, err error) {
+func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err error) {
 	node2name, err := s.QueryNodes(true)
 	if err != nil {
 		return
@@ -66,14 +68,14 @@ func (s *Server) QueryLatestMonitorInfo() (ret *LatestMonitorInfo, err error) {
 		return
 	}
 	defer rows.Close()
-	ret = &LatestMonitorInfo{
-		Websites:  make([]WebsiteInfo, 0, 10),
+	ret = &internal.LatestMonitorInfo{
+		Websites:  make([]internal.WebsiteInfo, 0, 10),
 		NodeNames: node2name,
 	}
 	lastSite := -1
-	var siteInfo *WebsiteInfo
+	var siteInfo *internal.WebsiteInfo
 	for rows.Next() {
-		var record MonitorRec
+		var record internal.MonitorRec
 		var site, node int
 		var url string
 		var exist bool
@@ -97,10 +99,10 @@ func (s *Server) QueryLatestMonitorInfo() (ret *LatestMonitorInfo, err error) {
 			if siteInfo != nil {
 				ret.Websites = append(ret.Websites, *siteInfo)
 			}
-			siteInfo = &WebsiteInfo{
+			siteInfo = &internal.WebsiteInfo{
 				Id:    site,
 				Url:   url,
-				Nodes: make(map[int]MonitorRec),
+				Nodes: make(map[int]internal.MonitorRec),
 			}
 			lastSite = site
 		}
