@@ -5,7 +5,8 @@ go:
 before_install:
 - pwd
 install:
--
+- go get -d cli/server/server_main.go
+- go get -d cli/prober/prober_main.go
 script:
 - GOARCH=amd64 GOOS=linux go build -o tunaworks-server cli/server/server_main.go
 -

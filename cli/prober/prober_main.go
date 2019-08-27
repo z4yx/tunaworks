@@ -7,11 +7,8 @@ import (
 
 	toml "github.com/BurntSushi/toml"
 	prober "github.com/z4yx/tunaworks/prober"
-	"gopkg.in/op/go-logging.v1"
-	cli "gopkg.in/urfave/cli.v1"
+	cli "github.com/urfave/cli"
 )
-
-var logger = logging.MustGetLogger("tunaworks")
 
 func loadConfig(cfgFile string, cfg *prober.ProberConfig) error {
 	if cfgFile != "" {

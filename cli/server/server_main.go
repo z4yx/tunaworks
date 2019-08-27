@@ -7,7 +7,7 @@ import (
 
 	toml "github.com/BurntSushi/toml"
 	server "github.com/z4yx/tunaworks/server"
-	cli "gopkg.in/urfave/cli.v1"
+	cli "github.com/urfave/cli"
 )
 
 func loadConfig(cfgFile string, cfg *server.Config) error {
