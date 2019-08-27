@@ -166,7 +166,7 @@ var ssl = document.getElementById('ssl') && new Vue({
                     SortKey: 0,
                 };
                 if(rec.SSLError !== null) {
-                    item.Icon['fa-times'] = true;
+                    item.Icon['fa-times-circle'] = true;
                     item.ClassObj['table-danger'] = true;
                     item.Expiry = rec.SSLError;
                 } else if(CertIsAboutToExpire(rec.SSLExpire)){
