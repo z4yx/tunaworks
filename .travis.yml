@@ -1,0 +1,38 @@
+language: go
+sudo: false
+go:
+- 1.12.x
+env:
+- GO111MODULE=on
+before_install:
+- pwd
+install:
+-
+script:
+- GOARCH=amd64 GOOS=linux go build -o tunaworks-server cli/server/server_main.go
+-
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o tunaworks-prober.linux.x86_64 cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -o tunaworks-prober.macos cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -o tunaworks-prober.win64.exe cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o tunaworks-prober.linux.arm64 cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -o tunaworks-prober.linux.arm cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=mipsle GOOS=linux GOMIPS=softfloat go build -o tunaworks-prober.linux.mipsle cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=mips GOOS=linux GOMIPS=softfloat go build -o tunaworks-prober.linux.mipsbe cli/prober/prober_main.go
+- ./tunaworks-prober.linux.x86_64 -h
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: UI5By8hFIhoxPLhkJFksG2Oa6ALrHY6kE3puL9bL1lx4UJ9lVfF155YtrBgw1o0df/gKNnuQH+Wm+XUuxIo9o6Ij+vGFxMqcwzNsuc7/+DKDz2IclNLrmuNWV2TfLrs8d3mj1usFD8hvPBUPTnbUzfJRuGdbyMVEAfsoZEQALuXMvpT5TIIaBpmh6+JOI2/ySKyzphfflaAJXjEIoXC/MewYiIF+FmpN2ra105zYeIFhNhVYrSNFKrfDVN+ZdNzPKytQ63O9dCUEf4AQ6FGszq44in6ECjGAD4PgLh+qApxF9uTIrlucy3Lx9tby1zlQeDK/Qlt/u3fL3/5INxpoONqp86YZfzBrN7WiUwG12x8cG+BUd6855yW37WZdMgNNswm+iriKuT3Z3MEPx/WlmEfjyzrvQ9GiR4JL9Rp4LQX/LIIQnkCWwa+lY4m++r81xB04zyeY4xFrcUafBtIBrV2wWyjFVhQFW2+0NKpoKZYAl9hWKRQPYgQldrqP1vvg0NqCadYMINVdNAF1QT7N1ONjb2op11Mh4CXxp9KCkC0CE085PAK1HvMK1h5mWJNW/oKNa9uufUa2uu08SrExkpfTWclraDuKm5/eZhME8wqZqkryA4y5ve+3vcsgB0hoejqOrZ2LosRvJGCQuFOG1TcoUzdebClt0sDSmwx+r2U=
+  file:
+    - tunaworks-server
+    - tunaworks-prober.macos
+    - tunaworks-prober.win64.exe
+    - tunaworks-prober.linux.x86_64
+    - tunaworks-prober.linux.arm64
+    - tunaworks-prober.linux.arm
+    - tunaworks-prober.linux.mipsle
+    - tunaworks-prober.linux.mipsbe
+  on:
+    tags: true
+    repo: z4yx/tunaworks
