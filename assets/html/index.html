@@ -12,6 +12,27 @@
     .cell-site-state {
       text-align: center;
     }
+    .site-state-line2 {
+        position: relative;
+        display: inline-block;
+        /* border-bottom: 1px dotted black; */
+    }
+    .site-state-line2 .site-state-details {
+        visibility: hidden;
+        min-width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 6px;
+    
+        position: absolute;
+        z-index: 1;
+    }
+    
+    .site-state-line2:hover .site-state-details {
+        visibility: visible;
+    }
   </style>
 </head>
 
@@ -31,18 +52,21 @@
           <table class="table table-bordered table-sm table-hover">
             <thead>
               <tr>
-                <td class="text-center" scope="col">Sites \ Prober</td>
-                <th class="text-center" scope="col" v-for="name in latestInfo.NodeNames">{{name}}</th>
+                <td class="text-center" scope="col" rowspan="2">Sites \ Prober</td>
+                <th class="text-center" scope="col" colspan="2" v-for="pair in nodeNames">{{pair[1]}}</th>
+              </tr>
+              <tr>
+                <td class="text-center" scope="col" v-for="proto in secondRow">{{proto}}</td>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in latestInfo.Websites">
+              <tr v-for="site in websites">
                 <th class="align-middle table-light" scope="row">{{site.Url}}</th>
-                <td v-for="(name, node) in latestInfo.NodeNames" v-bind:class="site.Nodes[node].ClassObj">
-                  <i v-bind:class="site.Nodes[node].Icon"></i> <span
-                    class="site-state-line1">{{site.Nodes[node].Line1}}</span>
+                <td v-for="rec in site.Records" v-bind:class="rec.ClassObj">
+                  <i v-bind:class="rec.Icon"></i> <span
+                    class="site-state-line1">{{rec.Line1}}</span>
                   <br>
-                  <small>{{site.Nodes[node].Line2}}</small>
+                  <small class="site-state-line2">{{rec.Line2}} <span v-if="rec.Details" class="site-state-details">{{rec.Details}}</span></small>
                 </td>
               </tr>
             </tbody>
