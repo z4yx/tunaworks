@@ -69,11 +69,11 @@ func (ctx *ProberCtx) probeWebsites() {
 			logger.Error("Invalid url %s: %s", site.Url, err.Error())
 			continue
 		}
-		result := internal.ProbeResult{
-			WebsiteId: site.Id,
-		}
 		for _, network := range networks {
 			logger.Debug("Probing %d %s with %s", site.Id, site.Url, network)
+			result := internal.ProbeResult{
+				WebsiteId: site.Id,
+			}
 			if network == "tcp4" {
 				result.Protocol = 4
 			} else if network == "tcp6" {

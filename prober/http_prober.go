@@ -9,6 +9,7 @@ import (
 
 func ProbeHttpHost(network, url string) (statusCode int, responseTime time.Duration, httpErr error) {
 	myClient := http.Client{
+		Timeout: time.Second * 10,
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, _network, addr string) (net.Conn, error) {
 				logger.Debug("DialContext %s %s -> %s", addr, _network, network)
