@@ -46,7 +46,7 @@ var overall = document.getElementById('overall') && new Vue({
                     rec.ClassObj["alert-danger"] = true;
                     rec.Icon["fa-times"] = true;
                     if (rec.SSLError !== null) {
-                        rec.Line1 = "ERROR";
+                        rec.Line1 = "ERR";
                         if(rec.SSLError.length > 20){
                             let suffix = rec.SSLError.slice(-20);
                             if(suffix.indexOf(' ') > 0)
