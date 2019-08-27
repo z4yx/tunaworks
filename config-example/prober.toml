@@ -1,0 +1,7 @@
+debug = false
+ipv4 = true
+ipv6 = false
+server = "tuna.works"
+https = true
+token = "xxxxxx"
+interval = 60
