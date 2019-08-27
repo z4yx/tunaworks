@@ -1,6 +1,6 @@
 debug = false
 ipv4 = true
-ipv6 = false
+ipv6 = true
 server = "tuna.works"
 https = true
 token = "xxxxxx"
