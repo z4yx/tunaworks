@@ -20,7 +20,7 @@ func (s *Server) QueryNodes(active bool) (nodes map[int]internal.NodeInfo, err e
 		where = "WHERE active=1"
 	}
 
-	rows, err := s.db.Query("SELECT node, name, proto, heartbeat FROM nodes " + where)
+	rows, err := s.db.Query("SELECT node, name, proto FROM nodes " + where)
 	if err != nil {
 		return
 	}
@@ -29,7 +29,7 @@ func (s *Server) QueryNodes(active bool) (nodes map[int]internal.NodeInfo, err e
 	for rows.Next() {
 		var info internal.NodeInfo
 		var id int
-		err = rows.Scan(&id, &info.Name, &info.Proto, &info.Heartbeat)
+		err = rows.Scan(&id, &info.Name, &info.Proto)
 		if err != nil {
 			return
 		}

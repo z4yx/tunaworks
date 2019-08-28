@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ type Server struct {
 	cfg    *Config
 	engine *gin.Engine
 	db     *sql.DB
+	recent sync.Map
 }
 
 type empty struct {
@@ -40,6 +42,16 @@ func (s *Server) getLatestMonitorInfo(c *gin.Context) {
 		logger.Errorf("getLatestMonitorInfo: %s", err.Error())
 		c.JSON(http.StatusInternalServerError, empty{})
 	} else {
+		for node, info := range inf.NodeInfo {
+			t, ok := s.recent.Load(node)
+			// logger.Debug("%d %v %v", node ,ok, t)
+			if ok {
+				info.Heartbeat = t.(time.Time)
+			} else {
+				info.Heartbeat = time.Unix(0, 0)
+			}
+			inf.NodeInfo[node] = info
+		}
 		c.JSON(http.StatusOK, inf)
 	}
 }
@@ -72,6 +84,7 @@ func (s *Server) insertProberRecord(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		s.recent.Store(node, time.Now())
 		err := s.InsertRecord(node, &result)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, empty{})
