@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,12 @@ func (s *Server) getLatestMonitorInfo(c *gin.Context) {
 }
 
 func (s *Server) getAllWebsites(c *gin.Context) {
+	token := c.GetHeader("X-Token")
+	if proto, valid := c.GetQuery("Proto"); valid && token != "" {
+		if proto_i, err := strconv.Atoi(proto); err == nil {
+			s.UpdateNodeProtocol(token, proto_i)
+		}
+	}
 	inf, err := s.QuerySites(true)
 	if err != nil {
 		logger.Errorf("getAllWebsites: %s", err.Error())

@@ -2,26 +2,38 @@ package server
 
 import internal "github.com/z4yx/tunaworks/internal"
 
-func (s *Server) QueryNodes(active bool) (nodes map[int]string, err error) {
+func (s *Server) UpdateNodeProtocol(token string, proto int) (err error) {
+
+	r, err := s.db.Exec("UPDATE nodes SET proto=?,heartbeat=datetime('now') WHERE token=?",
+		proto, token)
+	if err != nil {
+		return
+	}
+	affected, _ := r.RowsAffected()
+	logger.Debug("RowsAffected %d", affected)
+	return
+}
+
+func (s *Server) QueryNodes(active bool) (nodes map[int]internal.NodeInfo, err error) {
 	where := ""
 	if active {
 		where = "WHERE active=1"
 	}
 
-	rows, err := s.db.Query("SELECT node, name FROM nodes " + where)
+	rows, err := s.db.Query("SELECT node, name, proto, heartbeat FROM nodes " + where)
 	if err != nil {
 		return
 	}
 	defer rows.Close()
-	nodes = make(map[int]string)
+	nodes = make(map[int]internal.NodeInfo)
 	for rows.Next() {
-		var name string
+		var info internal.NodeInfo
 		var id int
-		err = rows.Scan(&id, &name)
+		err = rows.Scan(&id, &info.Name, &info.Proto, &info.Heartbeat)
 		if err != nil {
 			return
 		}
-		nodes[id] = name
+		nodes[id] = info
 	}
 	return
 }
@@ -83,14 +95,14 @@ VALUES (?, ?, ?, ?, ?, ?, ?)`, rec.StatusCode, rec.ResponseTime, rec.WebsiteId, 
 }
 
 func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err error) {
-	node2name, err := s.QueryNodes(true)
+	nodeInfo, err := s.QueryNodes(true)
 	if err != nil {
 		return
 	}
-	// nodes := make([]string, len(node2name))
-	// for i, val := range node2name {
-	// 	nodes[i] = val
-	// }
+	node2name := make(map[int]string, len(nodeInfo))
+	for i, val := range nodeInfo {
+		node2name[i] = val.Name
+	}
 	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,protocol,http_code,response_time,ssl_err,ssl_expire
 	FROM (SELECT * FROM records ORDER BY site,node,protocol,updated DESC) tmp
 	INNER JOIN sites
@@ -103,6 +115,7 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 	ret = &internal.LatestMonitorInfo{
 		Websites:  make([]internal.WebsiteInfo, 0, 10),
 		NodeNames: node2name,
+		NodeInfo:  nodeInfo,
 	}
 	lastSite := -1
 	var siteInfo *internal.WebsiteInfo

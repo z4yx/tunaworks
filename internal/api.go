@@ -66,8 +66,15 @@ type WebsiteInfo struct {
 	Nodes6 map[int]MonitorRec
 }
 
+type NodeInfo struct {
+	Name      string
+	Heartbeat time.Time
+	Proto     int
+}
+
 type LatestMonitorInfo struct {
 	NodeNames map[int]string
+	NodeInfo  map[int]NodeInfo
 	Websites  []WebsiteInfo
 }
 

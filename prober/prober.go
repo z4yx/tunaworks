@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	internal "github.com/z4yx/tunaworks/internal"
@@ -15,11 +16,24 @@ import (
 type ProberCtx struct {
 	allWebsites internal.AllWebsites
 	cfg         *ProberConfig
+	client      *http.Client
 	baseUrl     string
 }
 
 func (ctx *ProberCtx) getWebsites() error {
-	resp, err := http.Get(ctx.baseUrl + "/prober/websites")
+	proto := 0
+	if ctx.cfg.IPv4 {
+		proto |= 1
+	}
+	if ctx.cfg.IPv6 {
+		proto |= 2
+	}
+	request, err := http.NewRequest("GET", ctx.baseUrl+"/prober/websites?Proto="+strconv.Itoa(proto), nil)
+	if err != nil {
+		return err
+	}
+	request.Header.Add("X-Token", ctx.cfg.Token)
+	resp, err := ctx.client.Do(request)
 	if err != nil {
 		return err
 	}
@@ -40,14 +54,13 @@ func (ctx *ProberCtx) reportResult(result *internal.ProbeResult) error {
 		return err
 	}
 	logger.Debug("result: %s", string(jbytes))
-	client := &http.Client{Timeout: time.Second * 10}
 	request, err := http.NewRequest("POST", ctx.baseUrl+"/prober/result", bytes.NewBuffer(jbytes))
 	if err != nil {
 		return err
 	}
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("X-Token", ctx.cfg.Token)
-	resp, err := client.Do(request)
+	resp, err := ctx.client.Do(request)
 	if err != nil {
 		return err
 	}
@@ -163,6 +176,7 @@ func MakeProber(cfg *ProberConfig) *ProberCtx {
 	ret := &ProberCtx{
 		cfg:     cfg,
 		baseUrl: proto + cfg.Server,
+		client:  &http.Client{Timeout: time.Second * 10},
 	}
 	return ret
 }
