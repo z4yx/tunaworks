@@ -131,6 +131,8 @@ var overall = document.getElementById('overall') && new Vue({
             // console.debug(date);
             if(date.startsWith("1970-"))
                 return 'never';
+            if(Date.now() - (new Date(date)).getTime() < 30 * 1000)
+                return 'just now';
             return moment(date).fromNow();
         }
     },
