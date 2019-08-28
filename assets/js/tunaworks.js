@@ -28,7 +28,7 @@ var overall = document.getElementById('overall') && new Vue({
     el: '#overall',
     data: {
         secondRow: [],
-        nodeNames: [],
+        nodeInfo: [],
         websites: [],
     },
     methods: {
@@ -78,22 +78,36 @@ var overall = document.getElementById('overall') && new Vue({
         },
         buildDispProp: function (info) {
             let secondRow = [];
-            let nodeNames = [];
+            let nodeInfo = [];
             for (let node_id in info.NodeNames) {
-                secondRow.push("IPv4");
-                secondRow.push("IPv6");
-                nodeNames.push([node_id, info.NodeNames[node_id]]);
+                let proto = info.NodeInfo[node_id].Proto;
+                let nProto = 0;
+                if(proto & 1){
+                    secondRow.push("IPv4");
+                    nProto++;
+                }
+                if(proto & 2){
+                    secondRow.push("IPv6");
+                    nProto++;
+                }
+                if(nProto == 0)
+                    continue;
+                nodeInfo.push([node_id, info.NodeNames[node_id], info.NodeInfo[node_id].Heartbeat, nProto]);
             }
-            this.nodeNames = nodeNames;
+            this.nodeInfo = nodeInfo;
             this.secondRow = secondRow;
             let websites = [];
             info.Websites.forEach((site) => {
                 this.buildCellContent(info, site, 4);
                 this.buildCellContent(info, site, 6);
                 let records = [];
-                for (let pair of nodeNames) { // order matters
-                    records.push(site.Nodes4[pair[0]]);
-                    records.push(site.Nodes6[pair[0]]);
+                for (let pair of nodeInfo) { // order matters
+                    let node_id = pair[0];
+                    let proto = info.NodeInfo[node_id].Proto;
+                    if(proto & 1)
+                        records.push(site.Nodes4[node_id]);
+                    if(proto & 2)
+                        records.push(site.Nodes6[node_id]);
                 }
                 websites.push({
                     Url: site.Url,
@@ -110,6 +124,14 @@ var overall = document.getElementById('overall') && new Vue({
             }, () => {
 
             });
+        }
+    },
+    filters: {
+        moment: function(date){
+            // console.debug(date);
+            if(date.startsWith("1970-"))
+                return 'never';
+            return moment(date).fromNow();
         }
     },
     created: function () {

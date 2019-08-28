@@ -53,7 +53,9 @@
             <thead>
               <tr>
                 <td class="text-center" scope="col" rowspan="2">Sites \ Prober</td>
-                <th class="text-center" scope="col" colspan="2" v-for="pair in nodeNames">{{pair[1]}}</th>
+                <th class="text-center" scope="col" v-bind:colspan="pair[3]" v-for="pair in nodeInfo">{{pair[1]}}<br>
+                  <small>{{pair[2] | moment}}</small>
+                </th>
               </tr>
               <tr>
                 <td class="text-center" scope="col" v-for="proto in secondRow">{{proto}}</td>
@@ -84,6 +86,7 @@
   <script src="assets/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+  <script src="assets/js/moments.min.js"></script>
   <script src="assets/js/vue.js"></script>
   <script src="assets/js/vue-resources.js"></script>
   <script src="assets/js/tunaworks.js"></script>
