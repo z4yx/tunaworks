@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="assets/css/bootstrap.min.css" crossorigin="anonymous">
   <title>TUNA works!</title>
   <style>
+    .refresh-icon{
+      font-size: 14px;
+      vertical-align: middle;
+    }
     .cell-site-state {
       text-align: center;
     }
@@ -42,8 +46,8 @@
       <div class="row justify-content-center">
         <div class="col-12">
           <div class="pb-2 mt-4 mb-2">
-            <h3>Overall Status</h3>
-          </div>
+            <h3>Overall Status <i v-bind:class="{ 'refresh-icon':true, fas: true, 'fa-sync': true, 'fa-spin': refreshing }"></i></h3>
+        </div>
         </div>
       </div>
       <div class="row justify-content-center">

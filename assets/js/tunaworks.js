@@ -30,6 +30,7 @@ var overall = document.getElementById('overall') && new Vue({
         secondRow: [],
         nodeInfo: [],
         websites: [],
+        refreshing: true,
     },
     methods: {
         buildCellContent: function(info, site, protocol) {
@@ -118,9 +119,11 @@ var overall = document.getElementById('overall') && new Vue({
             this.websites = websites;
         },
         loadLatest: function () {
+            this.refreshing = true;
             this.$http.get('monitor/latest').then((resp) => {
                 let body = resp.body;
                 this.buildDispProp(body);
+                this.refreshing = false;
             }, () => {
 
             });
@@ -138,7 +141,11 @@ var overall = document.getElementById('overall') && new Vue({
     },
     created: function () {
         this.loadLatest();
+        this.ticker = setInterval(this.loadLatest, 10000)
     },
+    beforeDestroy () {
+        clearInterval(this.ticker);
+    }
 })
 var ssl = document.getElementById('ssl') && new Vue({
     el: '#ssl',
