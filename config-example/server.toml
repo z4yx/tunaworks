@@ -3,5 +3,5 @@ debug = false
 [server]
 addr = "127.0.0.1"
 port = 8001
-db_provider = "sqlite3"
-db_name = "tunaworks.db"
+db_provider = "mysql"
+db_name = "tunaworks:tunaworks-db@tcp(localhost)/tunaworks?parseTime=true"

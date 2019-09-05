@@ -6,7 +6,7 @@ CREATE TABLE `records`(
     `node`           INT NOT NULL,
     `protocol`       INT NOT NULL,
     `updated`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `ssl_err`        VARCHAR DEFAULT NULL,
+    `ssl_err`        VARCHAR(256) DEFAULT NULL,
     `ssl_expire`     TIMESTAMP NOT NULL
 );
 

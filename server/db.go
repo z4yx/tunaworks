@@ -87,8 +87,12 @@ func (s *Server) AuthNode(token string) (succ bool, node int) {
 }
 
 func (s *Server) InsertRecord(node int, rec *internal.ProbeResult) error {
+	//logger.Debug("rec %p %v",s.db,rec)
 	r, err := s.db.Exec(`INSERT INTO records(http_code, response_time, site, node, protocol, ssl_err, ssl_expire)
 VALUES (?, ?, ?, ?, ?, ?, ?)`, rec.StatusCode, rec.ResponseTime, rec.WebsiteId, node, rec.Protocol, rec.SSLError, rec.SSLExpire)
+	if err == nil {
+		return  err
+	}
 	affected, _ := r.RowsAffected()
 	logger.Debug("RowsAffected %d", affected)
 	return err

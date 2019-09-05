@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -28,7 +27,6 @@ func (ni *NullInt64) UnmarshalJSON(data []byte) error {
 		ni.Valid = false
 		return nil
 	}
-	fmt.Printf("data %s\n", data)
 	ni.Valid = true
 	return json.Unmarshal(data, &ni.Int64)
 }
