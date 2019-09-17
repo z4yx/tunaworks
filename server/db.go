@@ -91,7 +91,7 @@ func (s *Server) InsertRecord(node int, rec *internal.ProbeResult) error {
 	r, err := s.db.Exec(`INSERT INTO records(http_code, response_time, site, node, protocol, ssl_err, ssl_expire)
 VALUES (?, ?, ?, ?, ?, ?, ?)`, rec.StatusCode, rec.ResponseTime, rec.WebsiteId, node, rec.Protocol, rec.SSLError, rec.SSLExpire)
 	if err == nil {
-		return  err
+		return err
 	}
 	affected, _ := r.RowsAffected()
 	logger.Debug("RowsAffected %d", affected)
@@ -108,7 +108,7 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 		node2name[i] = val.Name
 	}
 	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,protocol,http_code,response_time,ssl_err,ssl_expire
-	FROM (SELECT * FROM records ORDER BY site,node,protocol,updated DESC) tmp
+	FROM (SELECT * FROM records WHERE updated > NOW()-300 ORDER BY site,node,protocol,updated DESC) tmp
 	INNER JOIN sites
 	ON tmp.site = sites.site AND sites.active = 1
 	GROUP BY tmp.site, tmp.node, tmp.protocol`)
