@@ -108,7 +108,7 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 		node2name[i] = val.Name
 	}
 	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,protocol,http_code,response_time,ssl_err,ssl_expire
-	FROM (SELECT * FROM records WHERE updated > NOW()-300 ORDER BY site,node,protocol,updated DESC) tmp
+	FROM (SELECT * FROM records WHERE updated > NOW()-600 ORDER BY site,node,protocol,updated DESC) tmp
 	INNER JOIN sites
 	ON tmp.site = sites.site AND sites.active = 1
 	GROUP BY tmp.site, tmp.node, tmp.protocol`)
