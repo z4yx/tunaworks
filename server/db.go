@@ -107,11 +107,14 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 	for i, val := range nodeInfo {
 		node2name[i] = val.Name
 	}
-	rows, err := s.db.Query(`SELECT updated,tmp.site,url,node,protocol,http_code,response_time,ssl_err,ssl_expire
-	FROM (SELECT * FROM records WHERE updated > NOW()-600 ORDER BY site,node,protocol,updated DESC) tmp
-	INNER JOIN sites
-	ON tmp.site = sites.site AND sites.active = 1
-	GROUP BY tmp.site, tmp.node, tmp.protocol`)
+	rows, err := s.db.Query(`SELECT records.updated,tmp.site,url,tmp.node,tmp.protocol,http_code,response_time,ssl_err,ssl_expire 
+	FROM (SELECT site,node,protocol,MAX(updated) AS u FROM records GROUP BY site,node,protocol) tmp
+	INNER JOIN records ON tmp.site = records.site
+		AND tmp.site = records.site 
+		AND tmp.node = records.node 
+		AND tmp.protocol = records.protocol 
+		AND tmp.u = records.updated
+	INNER JOIN sites ON tmp.site = sites.site AND sites.active = 1`)
 	if err != nil {
 		return
 	}
