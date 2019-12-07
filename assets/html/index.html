@@ -57,7 +57,7 @@
             <thead>
               <tr>
                 <td class="text-center align-middle" scope="col" rowspan="2">Sites \ Prober</td>
-                <th class="text-center" scope="col" v-bind:colspan="pair[3]" v-for="pair in nodeInfo">{{pair[1]}}<br>
+                <th class="text-center" scope="col" v-bind:colspan="pair[3]" v-bind:class="{'table-warning': outdated(pair[2])}" v-for="pair in nodeInfo">{{pair[1]}}<br>
                   <small>{{pair[2] | moment}}</small>
                 </th>
               </tr>

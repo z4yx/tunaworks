@@ -33,6 +33,9 @@ var overall = document.getElementById('overall') && new Vue({
         refreshing: true,
     },
     methods: {
+        outdated: function (date) {
+            return (Date.now() - (new Date(date)).getTime() > 300 * 1000);
+        },
         buildCellContent: function(info, site, protocol) {
             let nodes = protocol == 4 ? site.Nodes4 : site.Nodes6;
             for (let node_id in nodes) {
