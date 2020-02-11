@@ -50,7 +50,11 @@ func main() {
 		Usage:     "TUNA.works prober",
 		Version:   "1.0",
 		Flags: []cli.Flag{
-			&cli.StringFlag{Name: "config-file, c", Usage: "`path` to your config file"},
+			&cli.StringFlag{
+				Name: "config-file, c",
+				Value: "prober.yaml",
+				Usage: "`path` to your config file",
+			},
 		},
 		Action: cmdRun,
 		Authors: []cli.Author{
