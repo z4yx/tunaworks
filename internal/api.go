@@ -83,6 +83,7 @@ type ProbeResult struct {
 	ResponseTime NullInt64
 	SSLError     NullString
 	SSLExpire    time.Time
+	SSLInfo      SSLInfo
 }
 
 type Website struct {
@@ -92,4 +93,14 @@ type Website struct {
 
 type AllWebsites struct {
 	Websites []Website
+}
+
+type SSLInfo struct {
+	NotBefore        time.Time
+	NotAfter         time.Time
+	CommonName       string
+	HaveOCSPStapling bool
+	OCSPStaplingErr  NullString
+	OCSPThisUpdate   time.Time
+	OCSPNextUpdate   time.Time
 }

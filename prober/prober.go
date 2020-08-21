@@ -100,8 +100,8 @@ func (ctx *ProberCtx) probeWebsites() {
 				}
 			}
 			if u.Scheme == "https" {
-				expiry, sslErr := ProbeSSLHost(network, u.Host)
-				logger.Debug("ProbeSSLHost (%v) %v", expiry, sslErr)
+				sslInfo, sslErr := ProbeSSLHost(network, u.Host)
+				logger.Debug("ProbeSSLHost (%v) %v", sslInfo.NotAfter, sslErr)
 				if sslErr != nil {
 					result.SSLError = internal.NullString{
 						sql.NullString{
@@ -112,7 +112,8 @@ func (ctx *ProberCtx) probeWebsites() {
 					ctx.reportResult(&result)
 					continue
 				}
-				result.SSLExpire = expiry
+				result.SSLExpire = sslInfo.NotAfter
+				result.SSLInfo = sslInfo
 			}
 			statusCode, responseTime, httpErr := ProbeHttpHost(network, u.String())
 			logger.Debug("ProbeHttpHost %v %v %v", statusCode, responseTime, httpErr)
