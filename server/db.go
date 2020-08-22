@@ -122,7 +122,8 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 	for i, val := range nodeInfo {
 		node2name[i] = val.Name
 	}
-	rows, err := s.db.Query(`SELECT records.updated,tmp.site,url,tmp.node,tmp.protocol,http_code,response_time,ssl_err,ssl_expire 
+	rows, err := s.db.Query(`SELECT records.updated,tmp.site,url,tmp.node,tmp.protocol,http_code,response_time,ssl_err,ssl_expire,
+	CAST(have_ocsp AS INT),ocsp_err,ocsp_this_update,ocsp_next_update
 	FROM (SELECT site,node,protocol,MAX(updated) AS u FROM records GROUP BY site,node,protocol) tmp
 	INNER JOIN records ON tmp.site = records.site
 		AND tmp.site = records.site 
@@ -155,7 +156,12 @@ func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err 
 			&record.StatusCode,
 			&record.ResponseTime,
 			&record.SSLError,
-			&record.SSLExpire)
+			&record.SSLExpire,
+			&record.HaveOCSPStapling,
+			&record.OCSPStaplingErr,
+			&record.OCSPThisUpdate,
+			&record.OCSPNextUpdate,
+		)
 		if err != nil {
 			return
 		}

@@ -15,6 +15,10 @@ type NullString struct {
 	sql.NullString
 }
 
+type NullTime struct {
+	sql.NullTime
+}
+
 func (ni NullInt64) MarshalJSON() ([]byte, error) {
 	if !ni.Valid {
 		return []byte("null"), nil
@@ -47,14 +51,34 @@ func (ni *NullString) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &ni.String)
 }
 
+func (ni NullTime) MarshalJSON() ([]byte, error) {
+	if !ni.Valid {
+		return []byte("null"), nil
+	}
+	return json.Marshal(ni.Time)
+}
+
+func (ni *NullTime) UnmarshalJSON(data []byte) error {
+	if bytes.Equal(data, []byte("null")) {
+		ni.Valid = false
+		return nil
+	}
+	ni.Valid = true
+	return json.Unmarshal(data, &ni.Time)
+}
+
 type MonitorRec struct {
-	Name         string
-	Protocol     int
-	StatusCode   NullInt64
-	ResponseTime NullInt64
-	SSLError     NullString
-	SSLExpire    time.Time
-	Updated      time.Time
+	Name             string
+	Protocol         int
+	StatusCode       NullInt64
+	ResponseTime     NullInt64
+	SSLError         NullString
+	SSLExpire        time.Time
+	Updated          time.Time
+	HaveOCSPStapling NullInt64
+	OCSPStaplingErr  NullString
+	OCSPThisUpdate   NullTime
+	OCSPNextUpdate   NullTime
 }
 
 type WebsiteInfo struct {

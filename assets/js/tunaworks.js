@@ -46,19 +46,20 @@ var overall = document.getElementById('overall') && new Vue({
                 rec.Icon = {
                     "fas": true
                 };
-                if (rec.SSLError !== null || rec.StatusCode >= 400) {
+                let sslErr = rec.SSLError || rec.OCSPStaplingErr;
+                if (sslErr !== null || rec.StatusCode >= 400) {
                     rec.ClassObj["alert-danger"] = true;
                     rec.Icon["fa-times"] = true;
-                    if (rec.SSLError !== null) {
+                    if (sslErr !== null) {
                         rec.Line1 = "ERR";
-                        if(rec.SSLError.length > 20){
-                            let suffix = rec.SSLError.slice(-20);
+                        if(sslErr.length > 20){
+                            let suffix = sslErr.slice(-20);
                             if(suffix.indexOf(' ') > 0)
                                 suffix = suffix.slice(suffix.indexOf(' '));
                             rec.Line2 = '...' + suffix;
-                            rec.Details = rec.SSLError;
+                            rec.Details = sslErr;
                         }else
-                            rec.Line2 = rec.SSLError;
+                            rec.Line2 = sslErr;
                     } else {
                         rec.Line1 = rec.StatusCode;
                         rec.Line2 = rec.ResponseTime + " ms";
