@@ -98,6 +98,21 @@ VALUES (?, ?, ?, ?, ?, ?, ?)`, rec.StatusCode, rec.ResponseTime, rec.WebsiteId, 
 	return err
 }
 
+func (s *Server) InsertRecordWithSSLInfo(node int, rec *internal.ProbeResult) error {
+	//logger.Debug("rec %p %v",s.db,rec)
+	r, err := s.db.Exec(`INSERT INTO records(http_code, response_time, site, node, protocol, ssl_err, ssl_expire,
+		have_ocsp,ocsp_err,ocsp_this_update,ocsp_next_update)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		rec.StatusCode, rec.ResponseTime, rec.WebsiteId, node, rec.Protocol, rec.SSLError, rec.SSLExpire,
+		rec.SSLInfo.HaveOCSPStapling, rec.SSLInfo.OCSPStaplingErr, rec.SSLInfo.OCSPThisUpdate, rec.SSLInfo.OCSPNextUpdate)
+	if err == nil {
+		return err
+	}
+	affected, _ := r.RowsAffected()
+	logger.Debug("RowsAffected %d", affected)
+	return err
+}
+
 func (s *Server) QueryLatestMonitorInfo() (ret *internal.LatestMonitorInfo, err error) {
 	nodeInfo, err := s.QueryNodes(true)
 	if err != nil {

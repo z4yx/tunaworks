@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 	internal "github.com/z4yx/tunaworks/internal"
 )
 
@@ -86,7 +86,13 @@ func (s *Server) insertProberRecord(c *gin.Context) {
 			return
 		}
 		s.recent.Store(node, time.Now())
-		err := s.InsertRecord(node, &result)
+		var err error
+		// logger.Debugf("cn=%v", result.SSLInfo.CommonName)
+		if result.SSLInfo.CommonName != "" { // newer version of Prober
+			err = s.InsertRecordWithSSLInfo(node, &result)
+		} else {
+			err = s.InsertRecord(node, &result)
+		}
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, empty{})
 		} else {
