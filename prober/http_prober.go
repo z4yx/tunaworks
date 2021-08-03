@@ -20,6 +20,7 @@ func ProbeHttpHost(network, url string) (statusCode int, responseTime time.Durat
 				}
 				return myDial.DialContext(ctx, network, addr)
 			},
+			DisableKeepAlives: true,
 		},
 	}
 	req, httpErr := http.NewRequest("GET", url, nil)
