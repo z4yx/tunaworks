@@ -27,6 +27,7 @@ func ProbeHttpHost(network, url string) (statusCode int, responseTime time.Durat
 	if httpErr != nil {
 		return
 	}
+	req.Header.Set("User-Agent", "Harmless TUNAworks Prober")
 	start := time.Now()
 	res, httpErr := myClient.Do(req)
 	if httpErr != nil {
