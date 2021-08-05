@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func ProbeHttpHost(network, url string) (statusCode int, responseTime time.Duration, httpErr error) {
+func ProbeHttpHost(network, url, ua string) (statusCode int, responseTime time.Duration, httpErr error) {
 	myClient := http.Client{
 		Timeout: time.Second * 10,
 		Transport: &http.Transport{
@@ -27,7 +27,7 @@ func ProbeHttpHost(network, url string) (statusCode int, responseTime time.Durat
 	if httpErr != nil {
 		return
 	}
-	req.Header.Set("User-Agent", "Harmless TUNAworks Prober")
+	req.Header.Set("User-Agent", ua)
 	start := time.Now()
 	res, httpErr := myClient.Do(req)
 	if httpErr != nil {

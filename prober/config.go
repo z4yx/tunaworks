@@ -12,4 +12,5 @@ type ProberConfig struct {
 	Https    bool   `toml:"https"`
 	Token    string `toml:"token"`
 	Interval int    `toml:"interval"`
+	Version  string
 }

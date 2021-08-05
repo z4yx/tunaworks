@@ -10,6 +10,8 @@ import (
 	cli "github.com/urfave/cli"
 )
 
+var gitrev = ""
+
 func loadConfig(cfgFile string, cfg *server.Config) error {
 	if cfgFile != "" {
 		if _, err := toml.DecodeFile(cfgFile, cfg); err != nil {
@@ -48,7 +50,7 @@ func main() {
 		Name:      "tunaworks-server",
 		UsageText: `tunaworks-server [options]`,
 		Usage:     "TUNA.works server",
-		Version:   "1.0",
+		Version:   gitrev,
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "config-file, c", Usage: "`path` to your config file"},
 		},

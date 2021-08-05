@@ -115,7 +115,8 @@ func (ctx *ProberCtx) probeWebsites() {
 				result.SSLExpire = sslInfo.NotAfter
 				result.SSLInfo = sslInfo
 			}
-			statusCode, responseTime, httpErr := ProbeHttpHost(network, u.String())
+			UA := "Harmless TUNAworks Prober / " + ctx.cfg.Version
+			statusCode, responseTime, httpErr := ProbeHttpHost(network, u.String(), UA)
 			logger.Debug("ProbeHttpHost %v %v %v", statusCode, responseTime, httpErr)
 
 			if httpErr != nil {

@@ -9,15 +9,17 @@ before_install:
 install:
 -
 script:
-- GOARCH=amd64 GOOS=linux go build -o tunaworks-server cli/server/server_main.go
+- GIT_REV=$(git describe --always --tags --abbrev=8 --dirty)
+- LDFLAGS="-X main.gitrev=${GIT_REV}"
+- GOARCH=amd64 GOOS=linux go build -ldflags "${LDFLAGS}" -o tunaworks-server cli/server/server_main.go
 -
-- CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o tunaworks-prober.linux.x86_64 cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -o tunaworks-prober.macos cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -o tunaworks-prober.win64.exe cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o tunaworks-prober.linux.arm64 cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -o tunaworks-prober.linux.arm cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=mipsle GOOS=linux GOMIPS=softfloat go build -o tunaworks-prober.linux.mipsle cli/prober/prober_main.go
-- CGO_ENABLED=0 GOARCH=mips GOOS=linux GOMIPS=softfloat go build -o tunaworks-prober.linux.mipsbe cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags "${LDFLAGS}" -o tunaworks-prober.linux.x86_64 cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -ldflags "${LDFLAGS}" -o tunaworks-prober.macos cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=amd64 GOOS=windows go build -ldflags "${LDFLAGS}" -o tunaworks-prober.win64.exe cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -ldflags "${LDFLAGS}" -o tunaworks-prober.linux.arm64 cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -ldflags "${LDFLAGS}" -o tunaworks-prober.linux.arm cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=mipsle GOOS=linux GOMIPS=softfloat go build -ldflags "${LDFLAGS}" -o tunaworks-prober.linux.mipsle cli/prober/prober_main.go
+- CGO_ENABLED=0 GOARCH=mips GOOS=linux GOMIPS=softfloat go build -ldflags "${LDFLAGS}" -o tunaworks-prober.linux.mipsbe cli/prober/prober_main.go
 - ./tunaworks-prober.linux.x86_64 -h
 deploy:
   provider: releases

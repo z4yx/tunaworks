@@ -10,6 +10,8 @@ import (
 	cli "github.com/urfave/cli"
 )
 
+var gitrev = ""
+
 func loadConfig(cfgFile string, cfg *prober.ProberConfig) error {
 	if cfgFile != "" {
 		if _, err := toml.DecodeFile(cfgFile, cfg); err != nil {
@@ -38,6 +40,7 @@ func cmdRun(c *cli.Context) error {
 		fmt.Println(err)
 		return err
 	}
+	cfg.Version = gitrev
 	s := prober.MakeProber(&cfg)
 	s.Run()
 	return nil
@@ -48,7 +51,7 @@ func main() {
 		Name:      "tunaworks-prober",
 		UsageText: `tunaworks-prober [options]`,
 		Usage:     "TUNA.works prober",
-		Version:   "1.0",
+		Version:   gitrev,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name: "config-file, c",
