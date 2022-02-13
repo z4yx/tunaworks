@@ -1,0 +1,16 @@
+[Unit]
+Description=TUNA.works Web Server
+After=network.target
+
+[Service]
+Type=simple
+Environment=GIN_MODE=release
+ExecStart=/srv/tuna.works/tunaworks-server -c /srv/tuna.works/server.toml
+WorkingDirectory=/srv/tuna.works/
+User=nobody
+RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
