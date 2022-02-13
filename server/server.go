@@ -124,6 +124,7 @@ func (s *Server) Run() {
 }
 
 func MakeServer(cfg *Config) *Server {
+	setLogLevel(cfg)
 
 	s := &Server{
 		engine: gin.New(),

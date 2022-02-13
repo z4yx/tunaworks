@@ -171,6 +171,7 @@ func (ctx *ProberCtx) Run() {
 }
 
 func MakeProber(cfg *ProberConfig) *ProberCtx {
+	setLogLevel(cfg)
 	proto := "http://"
 	if cfg.Https {
 		proto = "https://"
