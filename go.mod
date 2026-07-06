@@ -1,6 +1,6 @@
 module github.com/z4yx/tunaworks
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v0.3.1
@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/urfave/cli v1.21.0
-	golang.org/x/crypto v0.45.0
+	golang.org/x/crypto v0.51.0
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473
 )
 
@@ -34,9 +34,9 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
